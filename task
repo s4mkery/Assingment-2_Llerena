@@ -1,23 +1,32 @@
-import random, string, os
+import random, string, os, time
 
 def selector():
-    print("Welcome to the password generator Please select one of the options:")
-    option = input("(1) Memorable password \n(2)Random Password")
+    while True:
+        print("Welcome to the password generator Please select one of the options:")
+        option = input("(1) Memorable password\n(2) Random password\n")
 
-    match option:
-        case"1":
-            print("1 pues")
-            pass
-        case"2":
-            print("2 pues")
-            pass
-        case _:
-            print("Invalid input. Choose 1 or 2")
-
-password = []
+        match option:
+            case"1":
+                print("You have selected Memorable password")
+                memorable_generation()
+                break
+            case"2":
+                print("You have selected Random password")
+                random_generation()
+                break
+            case _:
+                print("Invalid input. Choose 1 or 2")
 
 def memorable_generation():
-    n=3
+    while True:
+            mem_input = input("How many words should the password use? (2-6):").strip()
+            try:
+                n = int(mem_input)
+                if 2 <= n <= 6:
+                    break
+                print("Input out of allowed interval. Try a number between 2 and 6.")
+            except ValueError:
+                print("Invalid input. Please enter an integer number.")
     word_list = []    
     with open ("top_english_nouns_lower_100000.txt", "r") as words:
         for word in words:
@@ -28,14 +37,18 @@ def memorable_generation():
     chosen_words = random.sample(word_list,n)
     words_plus_digits = [f"{w}{random.randint(0, 9)}" for w in chosen_words]
     password = "-".join(words_plus_digits)
-    pass
+
+    save_progress("Memorable", "Generated_passwords.txt", password)
 def random_generation():
     while True:
-        length = int(input("How long should the password be? (4-12)"))
-        if 4 <= length <= 12:            
-            break 
-        else:
-            print("Input out of the allowed interval. Try a num between 4 and 12")
+        ran_input = input("How long should the password be? (4-12):").strip()
+        try:
+            length = int(ran_input)
+            if 4 <= length <= 12:
+                break
+            print("Input out of allowed interval. Try a number between 4 and 12.")
+        except ValueError:
+            print("Invalid input. Please enter an integer number.")
 
     characters = string.ascii_letters + string.digits
     include_punct= input("Include punctuation? (yes/no)").strip().lower()
@@ -44,5 +57,18 @@ def random_generation():
 
     ran_characters = random.choices(characters, k= length)
     password = "".join(ran_characters)
-def save_progress():
-    pass
+    save_progress("Random", "Generated_passwords.txt", password)
+    
+    
+
+def save_progress(folder ,txt, password):
+    os.makedirs(folder, exist_ok=True)
+
+    filepath= os.path.join(folder, txt)
+    timer = time.ctime()
+
+    with open(filepath, "a") as j:
+        j.write(f"{password} created at {timer}\n")
+
+if __name__ == "__main__":
+    selector()
